@@ -7,6 +7,7 @@ let mainWindow = null;
 let tray = null;
 let breakTimer = null;
 let timeRemaining = 30 * 60 * 1000;
+let initialTime = 30 * 60 * 1000;
 let breakDuration = 20;
 let isPaused = false;
 let isMinimized = false;
@@ -16,7 +17,10 @@ function loadConfig() {
   try {
     if (fs.existsSync(CONFIG_FILE)) {
       const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-      if (config.breakInterval) timeRemaining = config.breakInterval * 60 * 1000;
+      if (config.breakInterval) {
+        initialTime = config.breakInterval * 60 * 1000;
+        timeRemaining = initialTime;
+      }
       if (config.breakDuration) breakDuration = config.breakDuration;
     }
   } catch (err) {
@@ -27,7 +31,7 @@ function loadConfig() {
 function saveConfig() {
   try {
     const config = {
-      breakInterval: timeRemaining / 60000,
+      breakInterval: initialTime / 60000,
       breakDuration: breakDuration,
     };
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
@@ -222,12 +226,17 @@ ipcMain.on('reset-timer', () => {
 });
 
 ipcMain.on('timer-break-complete', () => {
-  timeRemaining = parseInt(mainWindow.webContents.executeJavaScript('window.initialTime || 30 * 60 * 1000'));
+  timeRemaining = initialTime;
   startBreakTimer();
+  
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('timer-reset');
+  }
 });
 
 ipcMain.on('update-timer-setting', (event, { interval, duration }) => {
-  timeRemaining = interval * 60 * 1000;
+  initialTime = interval * 60 * 1000;
+  timeRemaining = initialTime;
   breakDuration = duration;
   saveConfig();
   startBreakTimer();
