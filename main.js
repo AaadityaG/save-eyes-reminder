@@ -52,6 +52,8 @@ autoLauncher.enable().catch(err => {
 });
 
 function createMainWindow() {
+  const iconPath = path.join(__dirname, 'icon.png');
+  
   mainWindow = new BrowserWindow({
     width: 600,
     height: 500,
@@ -59,6 +61,7 @@ function createMainWindow() {
     minHeight: 350,
     show: false,
     resizable: true,
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -81,14 +84,8 @@ function createMainWindow() {
 }
 
 function createTray() {
-  try {
-    const iconPath = path.join(__dirname, 'icon.png');
-    tray = new Tray(iconPath);
-  } catch (err) {
-    // Fallback: create tray without custom icon
-    const { nativeImage } = require('electron');
-    tray = new Tray(nativeImage.createEmpty());
-  }
+  const iconPath = path.join(__dirname, 'icon.png');
+  tray = new Tray(iconPath);
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -147,27 +144,10 @@ function startBreakTimer() {
 
       if (timeRemaining <= 0) {
         clearInterval(breakTimer);
-        showBreakNotification();
         openBreakWindow();
       }
     }
   }, 1000);
-}
-
-function showBreakNotification() {
-  const notif = new Notification({
-    title: '👁️ Eye Break Time!',
-    body: 'Take a 20-second break. Look at something 20 feet away.',
-    urgency: 'critical',
-    timeoutType: 'never',
-  });
-  notif.show();
-
-  notif.on('click', () => {
-    if (mainWindow) {
-      mainWindow.show();
-    }
-  });
 }
 
 function openBreakWindow() {
@@ -186,7 +166,7 @@ function openBreakWindow() {
 }
 
 function resetTimer() {
-  timeRemaining = 30 * 60 * 1000;
+  timeRemaining = initialTime;
   isPaused = false;
   startBreakTimer();
   
@@ -195,14 +175,8 @@ function resetTimer() {
   }
   
   if (tray) {
-    tray.setToolTip('Eye Break Reminder - Timer reset! Next break in 30:00');
+    tray.setToolTip(`Eye Break Reminder - Timer reset! Next break in ${Math.round(initialTime / 60000)}:00`);
   }
-
-  const notif = new Notification({
-    title: 'Timer Reset',
-    body: 'Break timer has been reset to 30 minutes',
-  });
-  notif.show();
 }
 
 function formatTime(ms) {
@@ -244,12 +218,6 @@ ipcMain.on('update-timer-setting', (event, { interval, duration }) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('settings-updated', { interval, duration });
   }
-  
-  const notif = new Notification({
-    title: 'Settings Updated',
-    body: `Break every ${interval} minutes for ${duration} seconds`,
-  });
-  notif.show();
 });
 
 ipcMain.on('minimize-to-tray', () => {
