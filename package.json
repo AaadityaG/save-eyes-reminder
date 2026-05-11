@@ -1,0 +1,18 @@
+{
+  "name": "project-save-eys",
+  "version": "1.0.0",
+  "description": "Eye Break Reminder - Protect your eyes with regular breaks",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "electron": "^42.0.1"
+  }
+}
