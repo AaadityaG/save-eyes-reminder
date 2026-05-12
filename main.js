@@ -9,6 +9,7 @@ let breakTimer = null;
 let timeRemaining = 30 * 60 * 1000;
 let initialTime = 30 * 60 * 1000;
 let breakDuration = 20;
+let autoStart = true;
 let isPaused = false;
 let isMinimized = false;
 let isQuitting = false;
@@ -23,6 +24,7 @@ function loadConfig() {
         timeRemaining = initialTime;
       }
       if (config.breakDuration) breakDuration = config.breakDuration;
+      if (config.autoStart !== undefined) autoStart = config.autoStart;
     }
   } catch (err) {
     console.error('Failed to load config:', err);
@@ -34,6 +36,7 @@ function saveConfig() {
     const config = {
       breakInterval: initialTime / 60000,
       breakDuration: breakDuration,
+      autoStart: autoStart,
     };
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
   } catch (err) {
@@ -59,7 +62,7 @@ function createMainWindow() {
     show: false,
     resizable: true,
     icon: iconPath,
-    frame: true,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -69,7 +72,7 @@ function createMainWindow() {
   // Set the icon explicitly after window creation
   mainWindow.setIcon(iconPath);
 
-  // Remove the menu bar (File, Edit, View, etc.)
+  // Remove the menu bar
   mainWindow.setMenuBarVisibility(false);
 
   mainWindow.loadFile('index.html');
@@ -78,6 +81,12 @@ function createMainWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.maximize();
     mainWindow.show();
+    
+    // Send initial config to renderer
+    mainWindow.webContents.send('settings-updated', {
+      interval: initialTime / 60000,
+      duration: breakDuration
+    });
   });
 
   mainWindow.on('close', (e) => {
@@ -247,15 +256,16 @@ ipcMain.on('timer-break-complete', () => {
   }
 });
 
-ipcMain.on('update-timer-setting', (event, { interval, duration }) => {
+ipcMain.on('update-timer-setting', (event, { interval, duration, autoStart: newAutoStart }) => {
   initialTime = interval * 60 * 1000;
   timeRemaining = initialTime;
   breakDuration = duration;
+  if (newAutoStart !== undefined) autoStart = newAutoStart;
   saveConfig();
   startBreakTimer();
   
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('settings-updated', { interval, duration });
+    mainWindow.webContents.send('settings-updated', { interval, duration, autoStart });
   }
 });
 
@@ -295,7 +305,11 @@ ipcMain.on('quit-app', () => {
 app.whenReady().then(() => {
   createMainWindow();
   createTray();
-  startBreakTimer();
+  
+  // Only auto-start timer if autoStart is enabled
+  if (autoStart) {
+    startBreakTimer();
+  }
 
   setTimeout(() => {
     if (mainWindow) {
