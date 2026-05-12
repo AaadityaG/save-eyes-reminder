@@ -4,9 +4,9 @@ A beautiful desktop app that reminds you to take regular eye breaks to protect y
 
 ## Download
 
-📥 **[Download Eye Break Reminder Setup 1.0.0.exe](https://github.com/your-username/your-repo/raw/main/releases/Eye%20Break%20Reminder%20Setup%201.0.0.exe)**
+📥 **[Click here to Download Eye Break Reminder Setup 1.0.0.exe](https://github.com/AaadityaG/save-eyes-reminder/blob/main/releases/Eye%20Break%20Reminder%20Setup%201.0.0.exe)**
 
-*Direct download link for Windows installer*
+*Direct download link for Windows*
 
 ## Installation
 
