@@ -56,13 +56,10 @@ function createMainWindow() {
   const iconPath = path.join(__dirname, 'icon.png');
   
   mainWindow = new BrowserWindow({
-    width: 600,
-    height: 500,
-    minWidth: 400,
-    minHeight: 350,
     show: false,
     resizable: true,
     icon: iconPath,
+    frame: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -72,7 +69,16 @@ function createMainWindow() {
   // Set the icon explicitly after window creation
   mainWindow.setIcon(iconPath);
 
+  // Remove the menu bar (File, Edit, View, etc.)
+  mainWindow.setMenuBarVisibility(false);
+
   mainWindow.loadFile('index.html');
+
+  // Show and maximize after loading
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.maximize();
+    mainWindow.show();
+  });
 
   mainWindow.on('close', (e) => {
     if (!isQuitting && process.platform !== 'darwin') {

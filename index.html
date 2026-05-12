@@ -35,6 +35,19 @@
       padding: 40px 20px;
     }
 
+    .break-container .btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      opacity: 0.8;
+    }
+
+    .break-container .btn:hover {
+      background: rgba(255,255,255,0.15);
+      opacity: 1;
+    }
+
     .header {
       text-align: center;
       margin-bottom: 40px;
@@ -208,27 +221,44 @@
       display: none;
       text-align: center;
       animation: fadeIn 0.5s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(102, 126, 234, 0.15);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
     }
 
     .break-container.active {
-      display: block;
+      display: flex;
+    }
+
+    .break-content {
+      max-width: 600px;
+      padding: 40px;
     }
 
     .break-icon {
       font-size: clamp(3rem, 10vw, 5rem);
       margin-bottom: 20px;
+      opacity: 0.8;
     }
 
     .break-message {
       font-size: clamp(1.5rem, 4vw, 2rem);
       font-weight: 300;
       margin-bottom: 12px;
+      opacity: 0.9;
     }
 
     .break-instruction {
       font-size: clamp(1rem, 2.5vw, 1.25rem);
       margin-bottom: 30px;
-      opacity: 0.9;
+      opacity: 0.7;
       line-height: 1.6;
     }
 
@@ -237,6 +267,7 @@
       font-weight: 200;
       font-family: 'Courier New', monospace;
       margin: 20px 0;
+      opacity: 0.85;
     }
 
     .info {
@@ -274,15 +305,6 @@
       background: rgba(255,255,255,0.25);
     }
 
-    .window-btn.exit-btn {
-      background: rgba(255,100,100,0.3);
-      border-color: rgba(255,100,100,0.5);
-    }
-
-    .window-btn.exit-btn:hover {
-      background: rgba(255,100,100,0.5);
-    }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
@@ -315,7 +337,6 @@
 <body>
   <div class="window-controls">
     <button class="window-btn" onclick="minimizeToTray()" title="Minimize to tray">−</button>
-    <button class="window-btn exit-btn" onclick="quitApp()" title="Exit app">✕</button>
   </div>
 
   <div class="container">
@@ -380,14 +401,16 @@
     </div>
 
     <div id="break-view" class="break-container">
-      <div class="break-icon">🌿</div>
-      <div class="break-message">Time to Rest Your Eyes</div>
-      <div class="break-instruction">
-        Look at something 20 feet away<br>
-        for a few seconds
+      <div class="break-content">
+        <div class="break-icon">🌿</div>
+        <div class="break-message">Time to Rest Your Eyes</div>
+        <div class="break-instruction">
+          Look at something 20 feet away<br>
+          for a few seconds
+        </div>
+        <div class="break-timer" id="break-timer">20</div>
+        <button class="btn btn-primary" onclick="completeBreak()">Continue</button>
       </div>
-      <div class="break-timer" id="break-timer">20</div>
-      <button class="btn btn-primary" onclick="completeBreak()">Continue</button>
     </div>
   </div>
 
@@ -514,10 +537,6 @@
 
     function minimizeToTray() {
       ipcRenderer.send('minimize-to-tray');
-    }
-
-    function quitApp() {
-      ipcRenderer.send('quit-app');
     }
 
     ipcRenderer.on('timer-update', (event, time) => {
