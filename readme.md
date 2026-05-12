@@ -24,6 +24,14 @@ A beautiful desktop app that reminds you to take regular eye breaks to protect y
 - 🚀 Auto-starts on system login
 - ⏸️ Pause/resume functionality
 
+## Preview
+
+![Main Timer Screen](https://github.com/AaadityaG/save-eyes-reminder/raw/main/preview/Eye%20Sanctuary%20-%20Nature%20Zen%2012-05-2026%2012_49_56%20PM.png)
+
+![Break Reminder Screen](https://github.com/AaadityaG/save-eyes-reminder/raw/main/preview/Eye%20Sanctuary%20-%20Nature%20Zen%2012-05-2026%2012_50_15%20PM.png)
+
+![Settings Panel](https://github.com/AaadityaG/save-eyes-reminder/raw/main/preview/Eye%20Sanctuary%20-%20Nature%20Zen%2012-05-2026%2012_50_35%20PM.png)
+
 ## Build from Source
 
 ```bash
