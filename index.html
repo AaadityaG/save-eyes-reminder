@@ -353,7 +353,7 @@
     
     <div class="status-badge">
       <span id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 10px #4ade80;"></span>
-      <span id="status-text">Zen Focus Active</span>
+      <span id="status-text">Next break in...</span>
     </div>
 
     <div class="controls-bar">
@@ -363,7 +363,7 @@
       
       <button class="action-btn primary" id="pause-btn" onclick="togglePause()">
         <span id="pause-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></span>
-        <span id="pause-label">Pause Flow</span>
+        <span id="pause-label">Pause</span>
       </button>
 
       <button class="action-btn" onclick="toggleSettings()" title="Settings">
@@ -375,10 +375,10 @@
   <!-- Settings Overlay -->
   <div class="settings-overlay" id="settings-view">
     <div class="settings-content">
-      <h2 class="settings-header">Zen Settings</h2>
+      <h2 class="settings-header">Settings</h2>
       
       <div class="form-group">
-        <label class="label">Focus Interval (Minutes)</label>
+        <label class="label">Break Interval (Minutes)</label>
         <input type="number" class="input" id="interval-input" placeholder="20" min="1" max="120">
       </div>
 
@@ -393,7 +393,7 @@
           <div id="auto-start-toggle" style="width: 52px; height: 28px; border-radius: 14px; background: #4ade80; position: relative; transition: all 0.3s ease;">
             <div id="toggle-knob" style="width: 22px; height: 22px; border-radius: 50%; background: white; position: absolute; top: 3px; right: 3px; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
           </div>
-          <span style="color: #88a088; font-size: 0.9rem;">Automatically start timer on launch</span>
+          <span style="color: #88a088; font-size: 0.9rem;">Start timer automatically on launch</span>
         </div>
       </div>
 
@@ -408,11 +408,11 @@
   <div class="break-overlay" id="break-view">
     <div class="break-card">
       <div class="leaf-icon">🌿</div>
-      <h1 class="break-title">Breathe Deeply</h1>
-      <p style="font-size: 1.5rem; opacity: 0.7; margin-bottom: 20px;">Look at the distant horizon...</p>
+      <h1 class="break-title">Time to Rest Your Eyes</h1>
+      <p style="font-size: 1.5rem; opacity: 0.7; margin-bottom: 20px;">Look at something 20 feet away...</p>
       <div class="break-timer" id="break-timer">20</div>
       <button class="action-btn primary" onclick="completeBreak()" style="margin: 0 auto; width: 240px; height: 64px;">
-        I am Refreshed
+        I'm Refreshed
       </button>
     </div>
   </div>
@@ -465,12 +465,12 @@
       setProgress(progress);
       
       if (isPaused) {
-        statusText.textContent = "Flow Paused";
+        statusText.textContent = "Timer paused";
         statusDot.style.background = "#fbbf24";
         statusDot.style.boxShadow = "0 0 10px #fbbf24";
         timerElement.style.opacity = "0.4";
       } else {
-        statusText.textContent = "Zen Focus Active";
+        statusText.textContent = "Next break in...";
         statusDot.style.background = "#4ade80";
         statusDot.style.boxShadow = "0 0 10px #4ade80";
         timerElement.style.opacity = "1";
@@ -481,11 +481,11 @@
       isPaused = !isPaused;
       if (isPaused) {
         ipcRenderer.send('pause-timer');
-        pauseLabel.textContent = "Resume Flow";
+        pauseLabel.textContent = "Resume";
         pauseIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
       } else {
         ipcRenderer.send('resume-timer');
-        pauseLabel.textContent = "Pause Flow";
+        pauseLabel.textContent = "Pause";
         pauseIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
       }
       updateDisplay();
