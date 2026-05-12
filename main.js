@@ -11,6 +11,7 @@ let initialTime = 30 * 60 * 1000;
 let breakDuration = 20;
 let isPaused = false;
 let isMinimized = false;
+let isQuitting = false;
 const CONFIG_FILE = path.join(app.getPath('userData'), 'config.json');
 
 function loadConfig() {
@@ -68,10 +69,13 @@ function createMainWindow() {
     },
   });
 
+  // Set the icon explicitly after window creation
+  mainWindow.setIcon(iconPath);
+
   mainWindow.loadFile('index.html');
 
   mainWindow.on('close', (e) => {
-    if (process.platform !== 'darwin') {
+    if (!isQuitting && process.platform !== 'darwin') {
       e.preventDefault();
       mainWindow.hide();
       isMinimized = true;
@@ -85,6 +89,13 @@ function createMainWindow() {
 
 function createTray() {
   const iconPath = path.join(__dirname, 'icon.png');
+  
+  // Ensure icon exists before creating tray
+  if (!fs.existsSync(iconPath)) {
+    console.error('Icon file not found at:', iconPath);
+    return;
+  }
+  
   tray = new Tray(iconPath);
 
   const contextMenu = Menu.buildFromTemplate([
@@ -108,6 +119,28 @@ function createTray() {
     {
       label: 'Exit',
       click: () => {
+        isQuitting = true;
+        saveConfig();
+        
+        // Clear the break timer
+        if (breakTimer) {
+          clearInterval(breakTimer);
+          breakTimer = null;
+        }
+        
+        // Destroy the main window if it exists
+        if (mainWindow) {
+          mainWindow.removeAllListeners('close');
+          mainWindow.destroy();
+          mainWindow = null;
+        }
+        
+        // Remove the tray
+        if (tray) {
+          tray.destroy();
+          tray = null;
+        }
+        
         app.quit();
       },
     },
@@ -225,6 +258,32 @@ ipcMain.on('minimize-to-tray', () => {
     mainWindow.hide();
     isMinimized = true;
   }
+});
+
+ipcMain.on('quit-app', () => {
+  isQuitting = true;
+  saveConfig();
+  
+  // Clear the break timer
+  if (breakTimer) {
+    clearInterval(breakTimer);
+    breakTimer = null;
+  }
+  
+  // Destroy the main window if it exists
+  if (mainWindow) {
+    mainWindow.removeAllListeners('close');
+    mainWindow.destroy();
+    mainWindow = null;
+  }
+  
+  // Remove the tray
+  if (tray) {
+    tray.destroy();
+    tray = null;
+  }
+  
+  app.quit();
 });
 
 app.whenReady().then(() => {

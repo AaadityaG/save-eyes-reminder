@@ -274,6 +274,15 @@
       background: rgba(255,255,255,0.25);
     }
 
+    .window-btn.exit-btn {
+      background: rgba(255,100,100,0.3);
+      border-color: rgba(255,100,100,0.5);
+    }
+
+    .window-btn.exit-btn:hover {
+      background: rgba(255,100,100,0.5);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
       to { opacity: 1; transform: scale(1); }
@@ -306,6 +315,7 @@
 <body>
   <div class="window-controls">
     <button class="window-btn" onclick="minimizeToTray()" title="Minimize to tray">−</button>
+    <button class="window-btn exit-btn" onclick="quitApp()" title="Exit app">✕</button>
   </div>
 
   <div class="container">
@@ -492,11 +502,22 @@
       clearInterval(breakTimerInterval);
       breakView.classList.remove('active', 'pulse');
       normalView.style.display = 'block';
+      
+      // Automatically reset timer and minimize to tray
       ipcRenderer.send('timer-break-complete');
+      
+      // Close the window after a brief delay
+      setTimeout(() => {
+        ipcRenderer.send('minimize-to-tray');
+      }, 500);
     }
 
     function minimizeToTray() {
       ipcRenderer.send('minimize-to-tray');
+    }
+
+    function quitApp() {
+      ipcRenderer.send('quit-app');
     }
 
     ipcRenderer.on('timer-update', (event, time) => {
