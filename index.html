@@ -517,6 +517,7 @@
         
         if (breakTimeRemaining <= 0) {
           clearInterval(breakTimerInterval);
+          completeBreak();
         }
       }, 1000);
     }
